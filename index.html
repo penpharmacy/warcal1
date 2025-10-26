@@ -1,9 +1,9 @@
-<!doctype html> 
+<!doctype html>
 <html lang="th">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>เครื่องคำนวณการให้ยา Warfarin โรงพยาบาลพุนพิน</title>
+<title>เครื่องคำนวณการให้ยา Warfarin ห้องยาโรงพยาบาลพุนพิน</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -11,24 +11,13 @@
   --card:#fff;
   --accent:#4CAF50;
   --muted:#607D8B;
-  --pink:#FFEBEE;
   font-family: 'Kanit', sans-serif;
 }
-.manual-card{
-  background:#FFF3E0;
-  border-left:8px solid #FF9800;
-}
-.manual-card h3{margin-top:0;color:#E65100}
-.manual-row{display:flex;gap:12px;margin-bottom:10px}
-.manual-row .col{flex:1}
-.manual-result{margin-top:10px;padding:10px;background:#FFF8E1;border-radius:8px}
-
 body{
   background:linear-gradient(180deg,var(--bg),#fff);
   margin:0;
   padding:20px;
   color:#263238;
-  position: relative;
 }
 body::before{
   content: "";
@@ -38,14 +27,14 @@ body::before{
   width: 100%;
   height: 100%;
   background: url('logo1.gif') center center no-repeat;
-  background-size: 400px auto; /* ปรับขนาดโลโก้ */
-  opacity: 0.08; /* ความจาง */
+  background-size: 400px auto;
+  opacity: 0.08;
   z-index: -1;
 }
 header{display:flex;align-items:center;gap:12px}
 h1{margin:0;font-size:20px;text-align:center;flex:1}
 .container{max-width:980px;margin:20px auto}
-.card{background: var(--card);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06);padding:18px;margin-bottom:16px}
+.card{background:var(--card);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06);padding:18px;margin-bottom:16px}
 label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
 input[type=number]{width:100%;padding:10px;border-radius:8px;border:1px solid #eee;font-size:16px}
 .row{display:flex;gap:12px}
@@ -60,31 +49,6 @@ th,td{padding:8px;border-bottom:1px solid #f0f0f0;text-align:center}
 .note{background:#FFF8E1;padding:8px;border-radius:8px;margin-top:8px;white-space:pre-line;}
 footer{font-size:13px;color:var(--muted);text-align:center;padding:8px}
 @media(max-width:720px){.row{flex-direction:column}}
-
-/* ---------- Styles for pill view ---------- */
-.pill-view-toggle {margin:10px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
-.pill-container {display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:10px}
-.pill-day {text-align:center;min-width:100px;padding:8px;border-radius:8px;background:#fafafa}
-.pill-icons {display:flex;justify-content:center;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
-.pill-icon {width:28px;height:28px;border-radius:50%;position:relative;display:inline-block}
-.pill-3 {background:#4FC3F7; box-shadow: 0 1px 2px rgba(0,0,0,0.15);} /* ฟ้า for 3mg */
-.pill-2 {background:#FFB74D; box-shadow: 0 1px 2px rgba(0,0,0,0.15);} /* ส้ม for 2mg */
-.pill-half {clip-path: inset(0 50% 0 0); border-top-right-radius: 0; border-bottom-right-radius:0;} /* half pill (left half visible) */
-
-/* tooltip */
-.pill-icon[title]:hover::after {
-  content: attr(title);
-  position: absolute;
-  bottom: 140%; left: 50%; transform: translateX(-50%);
-  background: rgba(0,0,0,0.75); color: #fff; font-size:12px; padding:6px 8px; border-radius:6px; white-space:nowrap;
-  z-index:10;
-}
-
-/* small text under icons */
-.pill-day .small { font-size:13px; color:var(--muted); line-height:1.2; margin-top:4px; }
-.pill-day strong { display:block; margin-top:4px; color:#263238; }
-
-/* make numeric table hidden when pill view active via JS (no CSS toggle here) */
 </style>
 </head>
 <body>
@@ -93,254 +57,144 @@ footer{font-size:13px;color:var(--muted);text-align:center;padding:8px}
 <h1>เครื่องคำนวณการให้ยา Warfarin โรงพยาบาลพุนพิน</h1>
 </header>
 
-  <section class="card">
-    <form id="form">
-      <div class="row">
-        <div class="col">
-          <label>INR ปัจจุบัน</label>
-          <input type="number" step="0.01" id="inr" min="0" value="2.5" required>
-        </div>
-        <div class="col">
-          <label>ขนาดยา Warfarin ต่อสัปดาห์ (mg)</label>
-          <input type="number" step="0.1" id="weeklyDose" min="0" value="35" required>
-        </div>
-        <div class="col">
-          <label>จำนวนวันนัด (วัน)</label>
-          <input type="number" id="days" min="1" value="7" required>
-        </div>
-      </div>
-
-      <div style="margin-top:12px">
-        <label>ชนิดเม็ดยาที่ใช้</label>
-        <div class="radio-row">
-          <label class="pill"><input type="radio" name="pills" value="3" checked> ใช้เม็ด 3 mg เท่านั้น</label>
-          <label class="pill"><input type="radio" name="pills" value="2"> ใช้เม็ด 2 mg เท่านั้น</label>
-          <label class="pill"><input type="radio" name="pills" value="both"> ใช้ทั้ง 2 และ 3 mg</label>
-        </div>
-      </div>
-
-      <div style="margin-top:12px">
-        <label>ภาวะเลือดออก</label>
-        <div class="radio-row">
-          <label class="pill"><input type="radio" name="bleed" value="no" checked> ไม่มี</label>
-          <label class="pill"><input type="radio" name="bleed" value="yes"> มี</label>
-        </div>
-      </div>
-    </form>
-
-    <div id="results" class="result" style="display:none"></div>
-  </section>
-
-  <section id="tables" class="card" style="display:none">
-    <h3>ตารางแผนการให้ยา (7 วัน)</h3>
-
-    <!-- View toggle -->
-    <div class="pill-view-toggle">
-      <label><input type="radio" name="viewMode" value="table" checked> แสดงเป็นตัวเลข</label>
-      <label><input type="radio" name="viewMode" value="pill"> แสดงเป็นรูปเม็ดยา</label>
+<section class="card">
+<form id="form">
+  <div class="row">
+    <div class="col">
+      <label>INR ปัจจุบัน</label>
+      <input type="number" step="0.01" id="inr" min="0" value="2.5" required>
     </div>
+    <div class="col">
+      <label>ขนาดยา Warfarin ต่อสัปดาห์ (mg)</label>
+      <input type="number" step="0.1" id="weeklyDose" min="0" value="35" required>
+    </div>
+    <div class="col">
+      <label>จำนวนวันนัด (วัน)</label>
+      <input type="number" id="days" min="1" value="7" required>
+    </div>
+  </div>
 
-    <div id="plans"></div>
-    <div id="pillView" style="display:none"></div>
-    <div id="summary"></div>
-    <div style="margin-top:12px;text-align:right">
-      <button onclick="window.print()" class="primary">ดาวน์โหลด / พิมพ์ (PDF)</button>
+  <div style="margin-top:12px">
+    <label>ชนิดเม็ดยาที่ใช้</label>
+    <div class="radio-row">
+      <label class="pill"><input type="radio" name="pills" value="3" checked> ใช้เม็ด 3 mg เท่านั้น</label>
+      <label class="pill"><input type="radio" name="pills" value="2"> ใช้เม็ด 2 mg เท่านั้น</label>
+      <label class="pill"><input type="radio" name="pills" value="both"> ใช้ทั้ง 2 และ 3 mg</label>
     </div>
-  </section>
-<!-- 🔹 กล่องใหม่สำหรับกรอกจำนวนเม็ดเอง -->
-  <section class="card manual-card">
-    <h3>คำนวณ Warfarin ต่อสัปดาห์ (กรอกเม็ดเอง)</h3>
-    <div class="manual-row">
-      <div class="col">
-        <label>จำนวนเม็ด 2 mg (รวม/สัปดาห์)</label>
-        <input type="number" step="0.5" id="manual2" min="0" value="0">
-      </div>
-      <div class="col">
-        <label>จำนวนเม็ด 3 mg (รวม/สัปดาห์)</label>
-        <input type="number" step="0.5" id="manual3" min="0" value="0">
-      </div>
+  </div>
+
+  <div style="margin-top:12px">
+    <label>ภาวะเลือดออก</label>
+    <div class="radio-row">
+      <label class="pill"><input type="radio" name="bleed" value="no" checked> ไม่มี</label>
+      <label class="pill"><input type="radio" name="bleed" value="yes"> มี</label>
     </div>
-    <div id="manualResult" class="manual-result">กรอกจำนวนเม็ดเพื่อคำนวณ</div>
-  </section>
-  <footer class="card small">คำเตือน: เครื่องมือนี้เป็นเครื่องมือช่วยคำนวณเท่านั้น ไม่ใช่คำสั่งการรักษา เเพทย์/เภสัชกรเป็นผู้ตัดสินใจขั้นสุดท้าย</footer>
+  </div>
+</form>
+
+<div id="results" class="result" style="display:none"></div>
+</section>
+
+<section id="tables" class="card" style="display:none">
+<h3>ตารางแผนการให้ยา (7 วัน)</h3>
+<div id="plans"></div>
+<div style="margin-top:12px;text-align:right">
+  <button onclick="window.print()" class="primary">ดาวน์โหลด / พิมพ์ (PDF)</button>
+</div>
+</section>
+
+<footer class="card small">คำเตือน: เครื่องมือนี้เป็นเครื่องมือช่วยคำนวณเท่านั้น ไม่ใช่คำสั่งการรักษา เเพทย์/เภสัชกรเป็นผู้ตัดสินใจขั้นสุดท้าย</footer>
 </div>
 
 <script>
-/* ---------------- Manual Calculation ---------------- */
-function calculateManual(){
-  const n2 = parseFloat(document.getElementById('manual2').value)||0;
-  const n3 = parseFloat(document.getElementById('manual3').value)||0;
-  const oldWeekly = parseFloat(document.getElementById('weeklyDose').value)||0;
-
-  const total = n2*2 + n3*3;
-  let diffPct = 0;
-  if(oldWeekly>0){
-    diffPct = ((total - oldWeekly)/oldWeekly)*100;
-  }
-  let pctText = diffPct===0 ? '±0%' : (diffPct>0 ? `+${diffPct.toFixed(2)}%` : `${diffPct.toFixed(2)}%`);
-
-  document.getElementById('manualResult').innerHTML =
-    `<strong>รวมใหม่:</strong> ${total.toFixed(2)} mg/สัปดาห์<br>
-     <strong>เทียบกับเดิม:</strong> ${oldWeekly.toFixed(2)} mg/สัปดาห์<br>
-     <strong>ผลต่าง:</strong> ${pctText}`;
-}
-
-document.getElementById('manual2').addEventListener('input', calculateManual);
-document.getElementById('manual3').addEventListener('input', calculateManual);
-document.getElementById('weeklyDose').addEventListener('input', calculateManual);
-
-// เรียกครั้งแรก
-calculateManual();
 function roundHalf(x){return Math.round(x*2)/2}
-function distributeEvenly(totalHalfUnits, days){
-  const base = Math.floor(totalHalfUnits/days);
-  let arr = Array(days).fill(base);
-  let rem = totalHalfUnits - base*days;
+
+function distributeEvenly7(total){
+  const base = Math.floor(total/7);
+  let arr = Array(7).fill(base);
+  let rem = total - base*7;
   for(let i=0;i<rem;i++) arr[i]++;
   return arr;
 }
+
 function findBestCombo(target){
-  if(target % 5 === 0){
-    let num5 = target / 5;
-    if(num5 <=7){
-      return {h3:num5*2,h2:num5*2,total:num5*5};
-    }
-    const sets = Math.floor(num5 / 4);
-    const rem = num5 % 4;
-    const h3 = sets*4 + Math.min(rem*2, rem*2);
-    const h2 = sets*4 + Math.max(0, rem*2 - h3);
-    return {h3:h3,h2:h2,total:target};
-  }
-  let best = null;
-  let max5 = Math.floor(target / 5);
-  for(let n5=max5;n5>=0;n5--){
-    let rem = target - n5*5;
-    let n3 = Math.floor(rem / 3);
-    let n2 = Math.round((rem - n3*3)/2);
-    if(n3 + n2 === 0) continue;
-    let total = n5*5 + n3*3 + n2*2;
-    let diff = Math.abs(total - target);
-    if(!best || diff < Math.abs(best.total - target)){
-      best = {h3: n5*2 + n3*2, h2: n5*2 + n2*2, total: total};
-    }
-    if(diff < 0.01) break;
-  }
-  return best;
+    const numSets = Math.round(target / 5);
+    const h3 = numSets;
+    const h2 = numSets;
+    const total = h3*3 + h2*2;
+    return {h3:h3, h2:h2, total:total};
 }
-function buildPlanHTML(title, combo, percentText){
-  const h3 = combo.h3; const h2 = combo.h2; const total = combo.total;
-  const perDay3 = distributeEvenly(h3,7);
-  const perDay2 = distributeEvenly(h2,7);
-  let html = `<h4>${title} — รวม ${total.toFixed(2)} mg/สัปดาห์ ${percentText ? `(${percentText})` : ''}</h4>`;
-  html += `<table class="numericTable"><thead><tr><th>วัน</th><th>3 mg (เม็ด)</th><th>2 mg (เม็ด)</th><th>รวม (mg)</th></tr></thead><tbody>`;
+
+function buildPlan5mg(title, combo, weeklyDose){
+    const perDay3 = distributeEvenly7(combo.h3);
+    const perDay2 = distributeEvenly7(combo.h2);
+    const totalWeekly = combo.h3*3 + combo.h2*2;
+    const diffWeekPct = weeklyDose===0?0:((totalWeekly-weeklyDose)/weeklyDose)*100;
+    let html = `<h4>${title} — รวม ${totalWeekly.toFixed(2)} mg/สัปดาห์ (${diffWeekPct>0?'+':''}${diffWeekPct.toFixed(2)}% จากเดิม)</h4>`;
+    html += `<table><thead><tr><th>วัน</th><th>3 mg (เม็ด)</th><th>2 mg (เม็ด)</th><th>รวม (mg)</th></tr></thead><tbody>`;
+    const dayNames = ['จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์','อาทิตย์'];
+    for(let i=0;i<7;i++){
+        const t3 = perDay3[i];
+        const t2 = perDay2[i];
+        const mg = t3*3 + t2*2;
+        html += `<tr><td>${dayNames[i]}</td><td>${t3}</td><td>${t2}</td><td>${mg.toFixed(2)}</td></tr>`;
+    }
+    html += `</tbody></table>`;
+    return html;
+}
+
+function buildPlanHTML(title, combo, pctText){
+  const perDay3 = distributeEvenly7(combo.h3);
+  const perDay2 = distributeEvenly7(combo.h2);
+  const total = combo.total;
+  let html = `<h4>${title} — รวม ${total.toFixed(2)} mg/สัปดาห์ ${pctText ? `(${pctText})` : ''}</h4>`;
+  html += `<table><thead><tr><th>วัน</th><th>3 mg (เม็ด)</th><th>2 mg (เม็ด)</th><th>รวม (mg)</th></tr></thead><tbody>`;
   const dayNames = ['จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์','อาทิตย์'];
-  // NOTE: original code displayed days differently; keep this table consistent with previous implementation
-  const dayNamesShort = ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
   for(let i=0;i<7;i++){
     const t3 = perDay3[i]/2;
     const t2 = perDay2[i]/2;
     const mg = t3*3 + t2*2;
-    html += `<tr><td>${dayNamesShort[i]}</td><td>${t3 % 1 === 0 ? t3 : t3.toFixed(2)}</td><td>${t2 % 1 === 0 ? t2 : t2.toFixed(2)}</td><td>${mg.toFixed(2)}</td></tr>`;
+    html += `<tr><td>${dayNames[i]}</td><td>${t3 % 1 === 0 ? t3 : t3.toFixed(2)}</td><td>${t2 % 1 === 0 ? t2 : t2.toFixed(2)}</td><td>${mg.toFixed(2)}</td></tr>`;
   }
   html += `</tbody></table>`;
   return html;
 }
 
-/* ---------- Build pill-view representation (only UI; does not change calculations) ---------- */
-function buildPillViewHTML(title, combo){
-  const h3 = combo.h3; const h2 = combo.h2;
-  const perDay3 = distributeEvenly(h3,7);
-  const perDay2 = distributeEvenly(h2,7);
-  const dayNamesShort = ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
-
-  let html = `<h4>${title}</h4>`;
-  html += `<div class="pill-container">`;
-  for(let i=0;i<7;i++){
-    const t3 = perDay3[i]/2; // number of 3mg pills (can be .5)
-    const t2 = perDay2[i]/2; // number of 2mg pills (can be .5)
-
-    let icons = '';
-    // 3 mg pills (blue)
-    const whole3 = Math.floor(t3);
-    const half3 = (t3 - whole3) >= 0.5 ? 1 : 0;
-    for(let w=0; w<whole3; w++){
-      icons += `<span class="pill-icon pill-3" title="Warfarin 3 mg"></span>`;
-    }
-    if(half3){
-      icons += `<span class="pill-icon pill-3 pill-half" title="Warfarin 3 mg ครึ่งเม็ด"></span>`;
-    }
-
-    // 2 mg pills (orange)
-    const whole2 = Math.floor(t2);
-    const half2 = (t2 - whole2) >= 0.5 ? 1 : 0;
-    for(let w=0; w<whole2; w++){
-      icons += `<span class="pill-icon pill-2" title="Warfarin 2 mg"></span>`;
-    }
-    if(half2){
-      icons += `<span class="pill-icon pill-2 pill-half" title="Warfarin 2 mg ครึ่งเม็ด"></span>`;
-    }
-
-    const mg = (t3*3 + t2*2).toFixed(2);
-    // display number text: show halves as x0.5 (e.g., 1.5), keep as-is
-    const show3 = t3 > 0 ? `3 mg x${t3 % 1 === 0 ? t3 : t3.toFixed(1)}` : '';
-    const show2 = t2 > 0 ? `2 mg x${t2 % 1 === 0 ? t2 : t2.toFixed(1)}` : '';
-
-    html += `
-      <div class="pill-day">
-        <div class="pill-icons">${icons || '<span class="small">—</span>'}</div>
-        <div class="small">${show3}${show3 && show2 ? '<br>' : ''}${show2}</div>
-        <strong>${mg} mg</strong>
-        <div style="margin-top:6px;color:var(--muted)">${dayNamesShort[i]}</div>
-      </div>
-    `;
-  }
-  html += `</div>`;
-  return html;
-}
-
-/* -------------------- Main calculate() (original logic preserved) -------------------- */
 function calculate(){
   const inr = parseFloat(document.getElementById('inr').value);
   const weeklyDose = parseFloat(document.getElementById('weeklyDose').value);
-  const days = parseInt(document.getElementById('days').value,10);
   const pillChoice = document.querySelector('input[name="pills"]:checked').value;
   const bleed = document.querySelector('input[name="bleed"]:checked').value;
-  if(isNaN(inr)||isNaN(weeklyDose)||isNaN(days)){return}
+  if(isNaN(inr)||isNaN(weeklyDose)) return;
 
   const resDiv = document.getElementById('results');
   const tables = document.getElementById('tables');
   const plansDiv = document.getElementById('plans');
-  const summaryDiv = document.getElementById('summary');
-  const pillViewDiv = document.getElementById('pillView');
 
-  // ---------- กรณีเลือดออก ----------
-  if(bleed === 'yes'){
+  if(bleed==='yes'){
     resDiv.innerHTML = `<div class="card"><p><strong>คำแนะนำ:</strong> พบภาวะเลือดออก: ให้ Vit K1 และพิจารณาการรักษาเฉียบพลันตามข้อแนะนำทางการแพทย์</p></div>`;
-    resDiv.style.display = 'block';
-    tables.style.display = 'none';  // ไม่แสดงตารางใดๆ
-    plansDiv.innerHTML = '';
-    summaryDiv.innerHTML = '';
-    pillViewDiv.innerHTML = '';
-    return;  // จบฟังก์ชัน ไม่คำนวณค่า Warfarin
+    resDiv.style.display='block';
+    tables.style.display='none';
+    plansDiv.innerHTML='';
+    return;
   }
 
-  // ---------- ส่วนคำนวณปกติ ----------
   let adj = {minPct:0,maxPct:0,avgPct:0,note:''};
-  if(inr < 1.5){adj.minPct = 0.10; adj.maxPct = 0.20; adj.avgPct = 0.15; adj.note='เพิ่มขนาดยารายสัปดาห์ 10–20%';}
-  else if(inr >=1.5 && inr <=1.9){adj.minPct = 0.05; adj.maxPct = 0.10; adj.avgPct = 0.075; adj.note='เพิ่ม 5–10% หรือพิจารณาไม่ปรับ แต่ติดตาม INR บ่อยขึ้นเพื่อดูแนวโน้ม';}
-  else if(inr >=2.0 && inr <=3.0){adj.minPct = 0; adj.maxPct = 0; adj.avgPct = 0; adj.note='ไม่ต้องปรับยา';}
-  else if(inr >=3.1 && inr <=3.9){adj.minPct = -0.10; adj.maxPct = -0.05; adj.avgPct = -0.075; adj.note='ลดขนาดยารายสัปดาห์ 5–10%';}
-  else if(inr >3.9 && inr <5.0){adj.minPct = -0.10; adj.maxPct = -0.10; adj.avgPct = -0.10; adj.note='หยุดยา 1 วัน แล้วกลับมาเริ่มด้วยขนาดที่ลดลง 10%';}
-  else if(inr >=5.0 && inr <9.0){adj.minPct = -0.20; adj.maxPct = -0.20; adj.avgPct = -0.20; adj.note='หยุดยา 2 วัน แล้วกลับมาเริ่มด้วยขนาดที่ลดลง 20% — พิจารณาให้ Vitamin K₁ 1–2.5 mg รับประทาน ถ้ามีความเสี่ยงเลือดออก';}
-  else if(inr >= 9.0){adj.minPct = null; adj.maxPct = null; adj.avgPct = null; adj.note='INR > 9.0: หยุดยา ให้ Vitamin K₁ 2.5–5 mg รับประทาน และติดตาม INR อย่างใกล้ชิด — ปรึกษาแพทย์/เภสัชกรเพื่อการปรับยา';}
+  if(inr < 1.5){adj.minPct=0.10;adj.maxPct=0.20;adj.avgPct=0.15;adj.note='เพิ่มขนาดยารายสัปดาห์ 10–20%';}
+  else if(inr>=1.5 && inr<=1.9){adj.minPct=0.05;adj.maxPct=0.10;adj.avgPct=0.075;adj.note='เพิ่ม 5–10% หรือพิจารณาไม่ปรับ แต่ติดตาม INR บ่อยขึ้น';}
+  else if(inr>=2.0 && inr<=3.0){adj.minPct=0;adj.maxPct=0;adj.avgPct=0;adj.note='ไม่ต้องปรับยา';}
+  else if(inr>=3.1 && inr<=3.9){adj.minPct=-0.10;adj.maxPct=-0.05;adj.avgPct=-0.075;adj.note='ลดขนาดยารายสัปดาห์ 5–10%';}
+  else if(inr>3.9 && inr<5.0){adj.minPct=-0.10;adj.maxPct=-0.10;adj.avgPct=-0.10;adj.note='หยุดยา 1 วัน แล้วกลับมาเริ่มด้วยขนาดที่ลดลง 10%';}
+  else if(inr>=5.0 && inr<9.0){adj.minPct=-0.20;adj.maxPct=-0.20;adj.avgPct=-0.20;adj.note='หยุดยา 2 วัน แล้วกลับมาเริ่มด้วยขนาดที่ลดลง 20% — พิจารณาให้ Vitamin K₁';}
+  else if(inr>=9.0){adj.minPct=null;adj.maxPct=null;adj.avgPct=null;adj.note='INR > 9.0: หยุดยา ให้ Vitamin K₁ 2.5–5 mg รับประทาน และติดตาม INR อย่างใกล้ชิด';}
 
   let newRange = {};
   if(adj.minPct===null){ 
     newRange.note = 'ไม่แนะนำให้คำนวณขนาดยาอัตโนมัติสำหรับ INR >= 9.0 — ให้ผู้เชี่ยวชาญประเมิน'; 
   } else{
-    const min = weeklyDose * (1 + adj.minPct);
-    const max = weeklyDose * (1 + adj.maxPct);
-    const avg = weeklyDose * (1 + adj.avgPct);
+    const min = weeklyDose*(1+adj.minPct);
+    const max = weeklyDose*(1+adj.maxPct);
+    const avg = weeklyDose*(1+adj.avgPct);
     newRange = {
       minCalc: parseFloat(min.toFixed(2)),
       maxCalc: parseFloat(max.toFixed(2)),
@@ -351,115 +205,85 @@ function calculate(){
     };
   }
 
-  let html = `<div class="card">`;
-  html += `<p><strong>คำแนะนำ:</strong> INR = ${inr.toFixed(2)} — ${adj.note}</p>`;
-  if(newRange.note){ html += `<p class="note">${newRange.note}</p>`; }
-  else{
-    html += `<p>ขนาดยาใหม่ต่อสัปดาห์ (mg) : <strong>${newRange.minCalc.toFixed(2)} — ${newRange.maxCalc.toFixed(2)}</strong> (เฉลี่ย ${newRange.avgCalc.toFixed(2)} mg)</p>`;
-  }
+  let html = `<div class="card"><p><strong>คำแนะนำ:</strong> INR = ${inr.toFixed(2)} — ${adj.note}</p>`;
+  if(newRange.note) html += `<p class="note">${newRange.note}</p>`; 
+  else html += `<p>ขนาดยาใหม่ต่อสัปดาห์ (mg) : <strong>${newRange.minCalc.toFixed(2)} — ${newRange.maxCalc.toFixed(2)}</strong> (เฉลี่ย ${newRange.avgCalc.toFixed(2)} mg)</p>`;
   html += `</div>`;
   resDiv.innerHTML = html; 
   resDiv.style.display='block';
 
-  // ---------- สร้างตาราง Warfarin ----------
-  plansDiv.innerHTML = '';
-  summaryDiv.innerHTML = '';
-  pillViewDiv.innerHTML = '';
-  if(newRange.min !== undefined){
+  plansDiv.innerHTML='';
+
+  if(newRange.min!==undefined){
     const targets = [
        {k:'ต่ำสุด', val:newRange.min, pct:adj.minPct},
        {k:'เฉลี่ย', val:newRange.avg, pct:adj.avgPct},
        {k:'สูงสุด', val:newRange.max, pct:adj.maxPct}
     ];
-    let summaryData = {min:{},avg:{},max:{}};
+
+    const numDays = parseInt(document.getElementById('days').value);
+
     targets.forEach(t=>{
       let best;
-      if(pillChoice === '3'){
-        const h3 = Math.round((t.val / 1.5));
-        best = {h3:h3,h2:0,total:h3*1.5};
-      } else if(pillChoice === '2'){
-        const h2 = Math.round(t.val / 1.0);
-        best = {h3:0,h2:h2,total:h2*1.0};
+      if(pillChoice==='3'){
+        const h3=Math.round(t.val/1.5);
+        best={h3:h3,h2:0,total:h3*1.5,type:'3mg'};
+      } else if(pillChoice==='2'){
+        const h2=Math.round(t.val/1.0);
+        best={h3:0,h2:h2,total:h2*1.0,type:'2mg'};
       } else {
-        best = findBestCombo(t.val);
+        best=findBestCombo(t.val);
+        best.type='5mg';
       }
-      if(t.k==='ต่ำสุด'){summaryData.min=best;}
-      if(t.k==='เฉลี่ย'){summaryData.avg=best;}
-      if(t.k==='สูงสุด'){summaryData.max=best;}
-      const diffPct = weeklyDose === 0 ? 0 : ((best.total - weeklyDose) / weeklyDose) * 100;
-      const pctText = diffPct > 0 ? `+${diffPct.toFixed(2)}%` : `${diffPct.toFixed(2)}%`;
-      plansDiv.innerHTML += buildPlanHTML(t.k, best, pctText);
+
+      let planHTML = '';
+      if(best.type==='5mg'){
+        planHTML += buildPlan5mg(t.k,best,weeklyDose);
+      } else {
+        planHTML += buildPlanHTML(t.k,best,((best.total-weeklyDose)/weeklyDose*100).toFixed(2)+'%');
+      }
+
+      // 🔧 สรุปจำนวนเม็ดยาจากการกระจายจริงในจำนวนวันนัด
+      let total3 = 0, total2 = 0;
+      const perDay3 = distributeEvenly7(best.h3);
+      const perDay2 = distributeEvenly7(best.h2);
+
+      for(let i=0; i<numDays; i++){
+          if(best.type==='5mg'){
+              total3 += perDay3[i % 7];
+              total2 += perDay2[i % 7];
+          } else if(best.type==='3mg'){
+              total3 += perDay3[i % 7]/2;
+          } else if(best.type==='2mg'){
+              total2 += perDay2[i % 7]/2;
+          }
+      }
+
+      total3 = Math.ceil(total3);
+      total2 = Math.ceil(total2);
+
+      let noteText = `สรุปจำนวนเม็ดยา (${numDays} วันนัด)\n`;
+      if(total3>0) noteText += `รวม 3 mg: ${total3} เม็ด\n`;
+      if(total2>0) noteText += `รวม 2 mg: ${total2} เม็ด`;
+
+      if(noteText) planHTML += `<div class="note" style="white-space:pre-line">${noteText}</div>`;
+
+      plansDiv.innerHTML += planHTML;
     });
 
-    // Build pill view content for the SAME combos (we will show/hide according to selected mode)
-    // For clarity: show pill view for 'เฉลี่ย' combo (you can change to show min/avg/max set as desired)
-    // Here we create three pillViews for min/avg/max
-    let pillHTML = '';
-    pillHTML += buildPillViewHTML('ต่ำสุด', summaryData.min);
-    pillHTML += '<hr style="margin:12px 0;border:none;border-top:1px dashed #eee">';
-    pillHTML += buildPillViewHTML('เฉลี่ย', summaryData.avg);
-    pillHTML += '<hr style="margin:12px 0;border:none;border-top:1px dashed #eee">';
-    pillHTML += buildPillViewHTML('สูงสุด', summaryData.max);
-    pillViewDiv.innerHTML = pillHTML;
-
-    const min3 = summaryData.min.h3 / 2 * (days / 7);
-    const min2 = summaryData.min.h2 / 2 * (days / 7);
-    const avg3 = summaryData.avg.h3 / 2 * (days / 7);
-    const avg2 = summaryData.avg.h2 / 2 * (days / 7);
-    const max3 = summaryData.max.h3 / 2 * (days / 7);
-    const max2 = summaryData.max.h2 / 2 * (days / 7);
-
-    const totalMinMg = summaryData.min.total * (days / 7);
-    const totalAvgMg = summaryData.avg.total * (days / 7);
-    const totalMaxMg = summaryData.max.total * (days / 7);
-
-    summaryDiv.innerHTML = `สำหรับช่วงนัด ${days} วัน\n\n`+
-      `ต่ำสุด: ต้องใช้รวม ${min3.toFixed(1)} เม็ด(3 mg) และ ${min2.toFixed(1)} เม็ด(2 mg) -> จำนวนเม็ดจริงที่ควรจ่าย (ปัดขึ้น): ${Math.ceil(min3)} เม็ด(3 mg), ${Math.ceil(min2)} เม็ด(2 mg).\n\n`+
-      `เฉลี่ย: ต้องใช้รวม ${avg3.toFixed(1)} เม็ด(3 mg) และ ${avg2.toFixed(1)} เม็ด(2 mg) -> จำนวนเม็ดจริงที่ควรจ่าย (ปัดขึ้น): ${Math.ceil(avg3)} เม็ด(3 mg), ${Math.ceil(avg2)} เม็ด(2 mg).\n\n`+
-      `สูงสุด: ต้องใช้รวม ${max3.toFixed(1)} เม็ด(3 mg) และ ${max2.toFixed(1)} เม็ด(2 mg) -> จำนวนเม็ดจริงที่ควรจ่าย (ปัดขึ้น): ${Math.ceil(max3)} เม็ด(3 mg), ${Math.ceil(max2)} เม็ด(2 mg).\n\n`+
-      `ปริมาณรวม (mg): ต่ำสุด ${totalMinMg.toFixed(2)} mg, เฉลี่ย ${totalAvgMg.toFixed(2)} mg, สูงสุด ${totalMaxMg.toFixed(2)} mg.`;
-
-    summaryDiv.classList.add('note');
-    tables.style.display = 'block';
+    tables.style.display='block';
   } else {
-    plansDiv.innerHTML = `<div class="note">${newRange.note}</div>`;
-    tables.style.display = 'block';
-  }
-
-  // ensure view mode respects selected radio button
-  syncViewMode();
-}
-
-// -------------------- Event listeners --------------------
-document.querySelectorAll('input[name="pills"]').forEach(el=>el.addEventListener('change', calculate));
-document.querySelectorAll('input[name="bleed"]').forEach(el=>el.addEventListener('change', calculate));
-document.getElementById('inr').addEventListener('input', calculate);
-document.getElementById('weeklyDose').addEventListener('input', calculate);
-document.getElementById('days').addEventListener('input', calculate);
-
-// view mode toggle: when user switches between 'table' and 'pill'
-document.querySelectorAll('input[name="viewMode"]').forEach(r=>{
-  r.addEventListener('change', syncViewMode);
-});
-
-function syncViewMode(){
-  const mode = document.querySelector('input[name="viewMode"]:checked').value;
-  const plansDiv = document.getElementById('plans');
-  const pillView = document.getElementById('pillView');
-  // if mode is table => show numeric tables (plansDiv), hide pill view
-  if(mode === 'table'){
-    plansDiv.style.display = 'block';
-    // hide pillView
-    pillView.style.display = 'none';
-    // Also ensure numeric tables have default display (they are built into plansDiv)
-  } else {
-    // show pill view, hide numeric tables
-    plansDiv.style.display = 'none';
-    pillView.style.display = 'block';
+    plansDiv.innerHTML=`<div class="note">${newRange.note}</div>`;
+    tables.style.display='block';
   }
 }
 
-// เรียกครั้งแรก
+document.querySelectorAll('input[name="pills"]').forEach(el=>el.addEventListener('change',calculate));
+document.querySelectorAll('input[name="bleed"]').forEach(el=>el.addEventListener('change',calculate));
+document.getElementById('inr').addEventListener('input',calculate);
+document.getElementById('weeklyDose').addEventListener('input',calculate);
+document.getElementById('days').addEventListener('input',calculate);
+
 calculate();
 </script>
 </body>
